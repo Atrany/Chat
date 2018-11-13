@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Socket.Io</title>
+</head>
+<body>
+
+    <h2>List of Users</h2>
+    <ul>
+        <li id="userId"></li>
+    </ul>
+        
+    <div id="messagesDiv">
+
+    </div>
+
+    <input type="text" id="messageInput">
+    <button id="submitBtn">Envoyer</button>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io(); 
+        var pseudoMessage = prompt("Veuillez entrez votre pseudo :")
+        var messageDiv = document.getElementById('messagesDiv')
+        var submitBtn = document.getElementById('submitBtn')
+        var messageInput = document.getElementById('messageInput')
+        var listUser = document.getElementById('userId')
+        
+        addInList(listUser.value)
+
+        submitBtn.addEventListener('click', () => {
+            insertMessage(messageInput.value)
+            socket.emit('messages', {text: messageInput.value, pseudo: pseudoMessage})
+            messageInput.value = ''; 
+            pseudoMessage.value ='';
+        })
+        socket.on('message', (data) => {
+            console.log('Message received : ', data)
+            messageDiv.innerHTML+= '<p>'+pseudoMessage+' : '+ data + '</p>'
+        })
+        socket.on('messages', (data) => {
+            messageDiv.innerHTML+= '<p style="color: blue;">'+data.pseudo+' : '+ data.text +'</p>'
+        })
+        socket.on('user', (data) => {
+            listUser.innerHTML+= '<li>'+pseudoMessage+'</li>'
+        })
+        socket.on('users', (data) => {
+            listUser.innerHTML+= '<li>'+pseudoMessage+'</li>'
+        })
+
+        function insertMessage(message){
+            messageDiv.innerHTML+= '<p>'+ pseudoMessage +' : '+ message +'</p>'
+        }
+
+        function addInList(user){
+            listUser.innerHTML+= '<li>'+pseudoMessage+'</li>'  
+        }
+    </script>
+</body>
+</html>
